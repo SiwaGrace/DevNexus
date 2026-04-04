@@ -1,9 +1,11 @@
 import mongoose, { Mongoose } from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable.");
+function getMongoUri(): string {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error("Please define the MONGODB_URI environment variable.");
+  }
+  return uri;
 }
 
 interface MongooseCache {
@@ -39,13 +41,12 @@ export async function connectToDatabase(): Promise<Mongoose> {
     };
 
     // Store the pending connection promise so concurrent requests share one connection attempt.
-    cached.promise = mongoose.connect(MONGODB_URI, options);
+    cached.promise = mongoose.connect(getMongoUri(), options);
   }
 
   try {
     cached.conn = await cached.promise;
   } catch (error) {
-    // Reset the promise so a later retry can create a new connection attempt.
     cached.promise = null;
     throw error;
   }

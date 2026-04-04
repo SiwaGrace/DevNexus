@@ -1,10 +1,4 @@
-import {
-  HydratedDocument,
-  Model,
-  Schema,
-  model,
-  models,
-} from "mongoose";
+import { HydratedDocument, Model, Schema, model, models } from "mongoose";
 
 export interface IEvent {
   title: string;
@@ -65,7 +59,7 @@ const normalizeTime = (value: string): string => {
     }
 
     return `${String(normalizedHours).padStart(2, "0")}:${String(
-      minutes
+      minutes,
     ).padStart(2, "0")}`;
   }
 
@@ -80,7 +74,7 @@ const normalizeTime = (value: string): string => {
 
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
       2,
-      "0"
+      "0",
     )}`;
   }
 
@@ -104,12 +98,10 @@ const eventSchema = new Schema<IEvent>(
     organizer: { type: String, required: true, trim: true },
     tags: { type: [String], required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-eventSchema.index({ slug: 1 }, { unique: true });
-
-eventSchema.pre("save", function (this: EventDocument) {
+eventSchema.pre("save", async function (this: EventDocument) {
   const requiredStringFields: Array<
     keyof Pick<
       IEvent,
@@ -174,7 +166,20 @@ eventSchema.pre("save", function (this: EventDocument) {
     if (!generatedSlug) {
       throw new Error("title must produce a valid slug.");
     }
-    this.slug = generatedSlug;
+
+    const EventModel = models.Event || model<IEvent>("Event", eventSchema);
+    let candidateSlug = generatedSlug;
+    let counter = 1;
+    const excludeCurrentId = this.isNew ? {} : { _id: { $ne: this._id } };
+
+    while (
+      await EventModel.exists({ slug: candidateSlug, ...excludeCurrentId })
+    ) {
+      candidateSlug = `${generatedSlug}-${counter}`;
+      counter += 1;
+    }
+
+    this.slug = candidateSlug;
   }
 
   // Normalize date/time formats for consistent storage.
@@ -189,4 +194,3 @@ eventSchema.pre("save", function (this: EventDocument) {
 
 export const Event: Model<IEvent> =
   (models.Event as Model<IEvent>) || model<IEvent>("Event", eventSchema);
-

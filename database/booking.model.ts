@@ -17,8 +17,7 @@ export interface IBooking {
 
 type BookingDocument = HydratedDocument<IBooking>;
 
-const EMAIL_REGEX =
-  /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
 const bookingSchema = new Schema<IBooking>(
   {
@@ -39,10 +38,8 @@ const bookingSchema = new Schema<IBooking>(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-
-bookingSchema.index({ eventId: 1 });
 
 bookingSchema.pre("save", async function (this: BookingDocument) {
   this.email = this.email.trim().toLowerCase();
@@ -62,4 +59,3 @@ bookingSchema.pre("save", async function (this: BookingDocument) {
 export const Booking: Model<IBooking> =
   (models.Booking as Model<IBooking>) ||
   model<IBooking>("Booking", bookingSchema);
-
