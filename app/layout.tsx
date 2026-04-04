@@ -4,6 +4,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import LightRays from "./components/LightRays";
 import Navbar from "./components/Navbar";
+import { Suspense } from "react";
+import PostHogPageView from "./components/PostHogPageView";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -59,6 +61,9 @@ export default function RootLayout({
             saturation={1}
           />
         </div>
+        <Suspense fallback={null}>
+          <PostHogPageView />
+        </Suspense>
         <main>{children}</main>
       </body>
     </html>
