@@ -1,22 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { IEvent } from "@/database/event.model";
 
 interface Props {
-  title: string;
-  image: string;
-  slug: string;
-  location: string;
-  date: string;
-  time: string;
+  event: IEvent;
 }
 
-const EventCard = ({ title, image, slug, location, date, time }: Props) => {
+const EventCard = ({ event }: Props) => {
   return (
-    <Link href={`/events/${slug}`} id="event-card">
+    <Link href={`/events/${event.slug}`} id="event-card">
       <Image
-        src={image}
-        alt={title}
+        src={event.image}
+        alt={event.title}
         width={410}
         height={300}
         className="poster"
@@ -24,18 +20,18 @@ const EventCard = ({ title, image, slug, location, date, time }: Props) => {
 
       <div className="flex flex-row gap-2">
         <Image src="/icons/pin.svg" alt="location" width={14} height={14} />
-        <p className="location">{location}</p>
+        <p className="location">{event.location}</p>
       </div>
-      <p className="title">{title}</p>
+      <p className="title">{event.title}</p>
 
       <div className="datetime">
         <div>
           <Image src="/icons/calendar.svg" alt="date" width={14} height={14} />
-          <p>{date}</p>
+          <p>{event.date}</p>
         </div>
         <div>
           <Image src="/icons/clock.svg" alt="date" width={14} height={14} />
-          <p>{time}</p>
+          <p>{event.time}</p>
         </div>
       </div>
     </Link>
